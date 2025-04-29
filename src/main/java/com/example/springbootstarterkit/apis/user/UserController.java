@@ -22,12 +22,12 @@ import java.util.Map;
 public class UserController {
   private final AuthenticationManager authManager;
   private final PasswordEncoder passwordEncoder;
-  private final CustomUserDetailsService  userDetailsService;
+  private final CustomUserDetailsService userDetailsService;
 
   public UserController(
-      AuthenticationManager authManager,
-      PasswordEncoder passwordEncoder,
-      CustomUserDetailsService  userDetailsService
+    AuthenticationManager authManager,
+    PasswordEncoder passwordEncoder,
+    CustomUserDetailsService userDetailsService
   ) {
     this.authManager = authManager;
     this.passwordEncoder = passwordEncoder;
@@ -37,13 +37,13 @@ public class UserController {
   @PostMapping("/login")
   public ResponseEntity<?> login(@RequestBody LoginDto dto, HttpServletRequest req) {
     UsernamePasswordAuthenticationToken token =
-        new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
+      new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
     Authentication auth = authManager.authenticate(token);
 
     SecurityContextHolder.getContext().setAuthentication(auth);
     req.getSession(true).setAttribute(
-        HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-        SecurityContextHolder.getContext()
+      HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+      SecurityContextHolder.getContext()
     );
 
     return ResponseEntity.ok("로그인 성공");

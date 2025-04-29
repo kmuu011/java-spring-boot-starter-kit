@@ -14,14 +14,12 @@ public class MemoService {
     this.repo = repo;
   }
 
-  // 회원별 메모 조회
   public List<MemoEntity> getMemosByUser(Integer userIdx) {
     return repo.findByUserIdx(userIdx);
   }
 
-  // 단건 조회
   public MemoEntity getMemo(Integer idx) {
     return repo.findById(idx)
-        .orElseThrow(() -> new RuntimeException("Memo not found: " + idx));
+      .orElseThrow(() -> new RuntimeException("Memo not found: " + idx));
   }
 }

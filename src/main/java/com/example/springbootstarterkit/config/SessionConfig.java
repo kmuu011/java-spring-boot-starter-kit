@@ -14,15 +14,19 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @EnableRedisHttpSession
 public class SessionConfig implements BeanClassLoaderAware {
   private ClassLoader loader;
-  @Override public void setBeanClassLoader(ClassLoader cl) { this.loader = cl; }
+
+  @Override
+  public void setBeanClassLoader(ClassLoader cl) {
+    this.loader = cl;
+  }
 
   @Bean
   public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
     ObjectMapper om = new ObjectMapper();
     om.activateDefaultTyping(
-        om.getPolymorphicTypeValidator(),
-        ObjectMapper.DefaultTyping.NON_FINAL,
-        JsonTypeInfo.As.PROPERTY
+      om.getPolymorphicTypeValidator(),
+      ObjectMapper.DefaultTyping.NON_FINAL,
+      JsonTypeInfo.As.PROPERTY
     );
     om.registerModules(SecurityJackson2Modules.getModules(this.loader));
     return new GenericJackson2JsonRedisSerializer(om);

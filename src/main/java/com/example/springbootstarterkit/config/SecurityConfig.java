@@ -40,28 +40,27 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(
-      HttpSecurity http,
-      AuthenticationManager authManager
+    HttpSecurity http,
+    AuthenticationManager authManager
   ) throws Exception {
     http
-        .csrf(AbstractHttpConfigurer::disable)
-        .anonymous(AbstractHttpConfigurer::disable)
-        .authenticationManager(authManager)
-        .authenticationProvider(authenticationProvider())
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/user/signup", "/api/user/login", "/api/user/test").permitAll()
-            .anyRequest().authenticated()
-        )
-        .formLogin(AbstractHttpConfigurer::disable)
-        .httpBasic(AbstractHttpConfigurer::disable)
-        .securityContext(ctx ->
-            ctx.securityContextRepository(new HttpSessionSecurityContextRepository())
-        )
-        .sessionManagement(sess -> sess
-            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            .maximumSessions(1)
-            .maxSessionsPreventsLogin(true)
-        );
+      .csrf(AbstractHttpConfigurer::disable)
+      .authenticationManager(authManager)
+      .authenticationProvider(authenticationProvider())
+      .authorizeHttpRequests(auth -> auth
+        .requestMatchers("/api/user/signup", "/api/user/login", "/api/user/test").permitAll()
+        .anyRequest().authenticated()
+      )
+      .formLogin(AbstractHttpConfigurer::disable)
+      .httpBasic(AbstractHttpConfigurer::disable)
+      .securityContext(ctx ->
+        ctx.securityContextRepository(new HttpSessionSecurityContextRepository())
+      )
+      .sessionManagement(sess -> sess
+        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+        .maximumSessions(1)
+        .maxSessionsPreventsLogin(true)
+      );
 
     return http.build();
   }

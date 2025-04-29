@@ -25,10 +25,10 @@ public class CustomUserDetails implements UserDetails, Serializable {
 
   @JsonCreator
   public CustomUserDetails(
-      @JsonProperty("idx") Integer idx,
-      @JsonProperty("username") String username,
-      @JsonProperty("password") String password,
-      @JsonProperty("authorities") List<GrantedAuthority> authorities
+    @JsonProperty("idx") Integer idx,
+    @JsonProperty("username") String username,
+    @JsonProperty("password") String password,
+    @JsonProperty("authorities") List<GrantedAuthority> authorities
   ) {
     this.idx = idx;
     this.username = username;
@@ -37,10 +37,12 @@ public class CustomUserDetails implements UserDetails, Serializable {
   }
 
   public CustomUserDetails(UserEntity user) {
-    this(user.getIdx(),
-        user.getUsername(),
-        user.getPassword(),
-        List.of(new SimpleGrantedAuthority(user.getRole())));
+    this(
+      user.getIdx(),
+      user.getUsername(),
+      user.getPassword(),
+      List.of(new SimpleGrantedAuthority(user.getRole()))
+    );
   }
 
   @Override

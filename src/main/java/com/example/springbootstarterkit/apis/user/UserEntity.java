@@ -19,11 +19,14 @@ public class UserEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer idx;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 50)
   private String username;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 200)
   private String password;
+
+  @Column(nullable = false, length = 20)
+  private String role;
 
   @CreatedDate
   @Column(nullable = false, updatable = false)
@@ -32,7 +35,4 @@ public class UserEntity {
   @LastModifiedDate
   @Column(nullable = false)
   private LocalDateTime updatedAt;
-
-  @Column(nullable = false)
-  private String role;
 }

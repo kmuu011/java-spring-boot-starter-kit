@@ -10,10 +10,10 @@ public class PasswordConfig {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new Pbkdf2PasswordEncoder(
-        "secretPepper917271!",
-        16,
-        310000,
-        Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA512
+      "secretPepper917271!",
+      16,
+      310000,
+      Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA512
     );
   }
 }
