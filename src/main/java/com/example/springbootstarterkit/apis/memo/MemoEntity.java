@@ -17,10 +17,10 @@ import java.time.LocalDateTime;
 public class MemoEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer idx;
+  private Integer id;
 
   @Column(nullable = false)
-  private Integer userIdx;
+  private Integer userId;
 
   @Column(nullable = false, length = 1000)
   private String content;

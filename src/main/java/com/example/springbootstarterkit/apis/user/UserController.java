@@ -15,22 +15,17 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
   private final AuthenticationManager authManager;
-  private final PasswordEncoder passwordEncoder;
   private final CustomUserDetailsService userDetailsService;
 
   public UserController(
     AuthenticationManager authManager,
-    PasswordEncoder passwordEncoder,
     CustomUserDetailsService userDetailsService
   ) {
     this.authManager = authManager;
-    this.passwordEncoder = passwordEncoder;
     this.userDetailsService = userDetailsService;
   }
 
@@ -65,13 +60,6 @@ public class UserController {
   public ResponseEntity<?> logout(HttpServletRequest req, HttpServletResponse res) {
     new SecurityContextLogoutHandler().logout(req, res, SecurityContextHolder.getContext().getAuthentication());
     return ResponseEntity.ok("로그아웃 성공");
-  }
-
-  @PostMapping("/test")
-  public Map<String, String> test(@RequestBody Map<String, String> body) {
-    String raw = body.get("password");
-    String hashed = passwordEncoder.encode(raw);
-    return Map.of("hashedPassword", hashed);
   }
 
 }

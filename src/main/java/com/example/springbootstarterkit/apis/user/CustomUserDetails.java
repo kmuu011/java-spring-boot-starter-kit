@@ -18,19 +18,19 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails, Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final Integer idx;
+  private final Integer id;
   private final String username;
   private final String password;
   private final List<GrantedAuthority> authorities;
 
   @JsonCreator
   public CustomUserDetails(
-    @JsonProperty("idx") Integer idx,
+    @JsonProperty("id") Integer id,
     @JsonProperty("username") String username,
     @JsonProperty("password") String password,
     @JsonProperty("authorities") List<GrantedAuthority> authorities
   ) {
-    this.idx = idx;
+    this.id = id;
     this.username = username;
     this.password = password;
     this.authorities = authorities;
@@ -38,7 +38,7 @@ public class CustomUserDetails implements UserDetails, Serializable {
 
   public CustomUserDetails(UserEntity user) {
     this(
-      user.getIdx(),
+      user.getId(),
       user.getUsername(),
       user.getPassword(),
       List.of(new SimpleGrantedAuthority(user.getRole()))

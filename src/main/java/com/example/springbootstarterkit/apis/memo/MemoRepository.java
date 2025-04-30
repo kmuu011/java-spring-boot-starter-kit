@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface MemoRepository extends JpaRepository<MemoEntity, Integer> {
-  List<MemoEntity> findByUserIdx(Integer userIdx);
+  List<MemoEntity> findByUserIdOrderByIdDesc(Integer userId);
 }
