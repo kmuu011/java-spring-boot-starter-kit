@@ -3,17 +3,15 @@ package com.example.springbootstarterkit.apis.file;
 import com.example.springbootstarterkit.apis.file.dto.FileListResponseDto;
 import com.example.springbootstarterkit.apis.file.dto.FileResponseDto;
 import com.example.springbootstarterkit.apis.file.dto.FileUploadResponseDto;
-import jakarta.persistence.EntityNotFoundException;
+import com.example.springbootstarterkit.common.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -56,7 +54,7 @@ public class FileService {
 	@Transactional
 	public FileUploadResponseDto uploadFiles(Integer userId, List<MultipartFile> files) {
 		if (files == null || files.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "업로드할 파일이 없습니다");
+			throw new BusinessException("FILE_UPLOAD_EMPTY", HttpStatus.BAD_REQUEST, "업로드할 파일이 없습니다");
 		}
 
 		// 업로드 디렉토리 생성 (없을 경우)
@@ -65,7 +63,7 @@ public class FileService {
 			try {
 				Files.createDirectories(uploadPath);
 			} catch (IOException e) {
-				throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "업로드 디렉토리 생성 실패");
+				throw new BusinessException("FILE_STORAGE_ERROR", HttpStatus.INTERNAL_SERVER_ERROR, "업로드 디렉토리 생성 실패");
 			}
 		}
 
@@ -115,13 +113,13 @@ public class FileService {
 				uploadedFiles.add(FileResponseDto.from(savedEntity));
 
 			} catch (IOException e) {
-				throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+				throw new BusinessException("FILE_STORAGE_ERROR", HttpStatus.INTERNAL_SERVER_ERROR,
 					"파일 저장 중 오류 발생: " + file.getOriginalFilename());
 			}
 		}
 
 		if (uploadedFiles.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효한 파일이 없습니다");
+			throw new BusinessException("FILE_UPLOAD_INVALID", HttpStatus.BAD_REQUEST, "유효한 파일이 없습니다");
 		}
 
 		return FileUploadResponseDto.success(uploadedFiles);
@@ -129,11 +127,11 @@ public class FileService {
 
 	public FileEntity getFileById(Integer fileId, Integer userId) {
 		FileEntity file = fileRepository.findById(fileId)
-			.orElseThrow(() -> new EntityNotFoundException("파일을 찾을 수 없습니다: " + fileId));
+			.orElseThrow(() -> new BusinessException("FILE_NOT_FOUND", HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다: " + fileId));
 
 		// 권한 검증
 		if (!file.getUserId().equals(userId)) {
-			throw new AccessDeniedException("파일에 접근할 권한이 없습니다");
+			throw new BusinessException("FILE_FORBIDDEN", HttpStatus.FORBIDDEN, "파일에 접근할 권한이 없습니다");
 		}
 
 		return file;
@@ -152,7 +150,7 @@ public class FileService {
 		try {
 			Files.deleteIfExists(filePath);
 		} catch (IOException e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제 중 오류 발생");
+			throw new BusinessException("FILE_DELETE_ERROR", HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제 중 오류 발생");
 		}
 
 		// DB 레코드 삭제

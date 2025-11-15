@@ -1,12 +1,15 @@
 package com.example.springbootstarterkit.apis.memo;
 
-import jakarta.persistence.EntityNotFoundException;
+import com.example.springbootstarterkit.apis.memo.dto.MemoListResponseDto;
+import com.example.springbootstarterkit.apis.memo.dto.MemoResponseDto;
+import com.example.springbootstarterkit.common.exception.BusinessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @Service
@@ -22,12 +25,19 @@ public class MemoService {
     return repo.findByUserIdOrderByIdDesc(userid);
   }
 
-  public MemoEntity getMemo(Integer id, Integer userid) throws AccessDeniedException {
+  public MemoListResponseDto getMemoListWithPaging(Integer userId, int page, int count) {
+    Pageable pageable = PageRequest.of(page - 1, count); // 1-based to 0-based
+    Page<MemoEntity> memoPage = repo.findByUserIdOrderByIdDesc(userId, pageable);
+    Page<MemoResponseDto> dtoPage = memoPage.map(MemoResponseDto::from);
+    return new MemoListResponseDto(dtoPage);
+  }
+
+  public MemoEntity getMemo(Integer id, Integer userid) {
     MemoEntity memo = repo.findById(id)
-      .orElseThrow(() -> new EntityNotFoundException("Memo not found: " + id));
+      .orElseThrow(() -> new BusinessException("MEMO_NOT_FOUND", HttpStatus.NOT_FOUND, "Memo not found: " + id));
 
     if (!memo.getUserId().equals(userid)) {
-      throw new AccessDeniedException("권한이 없습니다.");
+      throw new BusinessException("MEMO_FORBIDDEN", HttpStatus.FORBIDDEN, "권한이 없습니다.");
     }
 
     return memo;
@@ -45,14 +55,10 @@ public class MemoService {
   @Transactional
   public MemoEntity updateMemo(Integer id, Integer userid, String newContent) {
     MemoEntity memo = repo.findById(id)
-      .orElseThrow(() -> new ResponseStatusException(
-        HttpStatus.NOT_FOUND, "Memo not found: " + id
-      ));
+      .orElseThrow(() -> new BusinessException("MEMO_NOT_FOUND", HttpStatus.NOT_FOUND, "Memo not found: " + id));
 
     if (!memo.getUserId().equals(userid)) {
-      throw new ResponseStatusException(
-        HttpStatus.FORBIDDEN, "수정 권한이 없습니다."
-      );
+      throw new BusinessException("MEMO_FORBIDDEN", HttpStatus.FORBIDDEN, "수정 권한이 없습니다.");
     }
 
     memo.setContent(newContent);
@@ -63,14 +69,10 @@ public class MemoService {
   @Transactional
   public void deleteMemo(Integer id, Integer userid) {
     MemoEntity memo = repo.findById(id)
-      .orElseThrow(() -> new ResponseStatusException(
-        HttpStatus.NOT_FOUND, "Memo not found: " + id
-      ));
+      .orElseThrow(() -> new BusinessException("MEMO_NOT_FOUND", HttpStatus.NOT_FOUND, "Memo not found: " + id));
 
     if (!memo.getUserId().equals(userid)) {
-      throw new ResponseStatusException(
-        HttpStatus.FORBIDDEN, "삭제 권한이 없습니다."
-      );
+      throw new BusinessException("MEMO_FORBIDDEN", HttpStatus.FORBIDDEN, "삭제 권한이 없습니다.");
     }
 
     repo.delete(memo);
