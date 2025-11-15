@@ -33,7 +33,7 @@ services:
       ]
     volumes:
       - "mysql:/var/lib/mysql:Z"
-      - ./sql/initSql.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./sql/initsql.sql:/docker-entrypoint-initdb.d/init.sql:ro
     environment:
       MYSQL_PASSWORD: root
       MYSQL_USER: prod
@@ -48,6 +48,8 @@ services:
     container_name: "production_server_0"
     image: production/spring-boot:latest
     ports: [ "8200:8200" ]
+    volumes:
+      - upload-data:/app/resources/uploads
     restart: unless-stopped
     networks:
       static-network:
@@ -57,6 +59,8 @@ services:
     container_name: "production_server_1"
     image: production/spring-boot:latest
     ports: [ "8201:8200" ]
+    volumes:
+      - upload-data:/app/resources/uploads
     restart: unless-stopped
     networks:
       static-network:
@@ -64,6 +68,7 @@ services:
 
 volumes:
   mysql:
+  upload-data:
 
 networks:
   static-network:
